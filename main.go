@@ -6,6 +6,7 @@ import (
 	"strconv"
 	"encoding/json"
 	"log"
+	"time"
 )
 
 func main(){
@@ -28,24 +29,40 @@ func main(){
 
 	if len(os.Args) >= 2 {
 		
-		if len(os.Args) == 2 && os.Args[1] == "list"{
+		if os.Args[1] == "list"{
 			if len(tasks) == 0{
 				fmt.Println("There is no tasks")
 				return
 			}
 			fmt.Println("\tListing of tasks")
 			//выводим листинг тасок
-			printTasks(tasks)
-			return
+			if len(os.Args) == 2{
+				printTasks(tasks)
+				return
+			} else if os.Args[2] == "todo"{
+				printByStatus(tasks, "todo")
+			} else if os.Args[2] == "in-progress"{
+				printByStatus(tasks, "in-progress")
+			} else if os.Args[2] == "done"{
+				printByStatus(tasks, "done")
+			} else {
+				log.Fatal("Wrong input")
+			}
+
 		} else if os.Args[1] == "add" && len(os.Args) == 3{
 			//добавление таски
 			number := len(tasks) + 1
 			taska := string(os.Args[2])
-			newTask := Task{Id: number, Task: taska}
+			st := "todo"
+			t := time.Now()
+			createdDate := t.Format("2006-01-02 15:04:05")
+			newTask := Task{Id: number, Task: taska, Status: st, Created: createdDate, Updated: createdDate}
 			tasks = append(tasks, newTask)
 
 			updateId(tasks) //обновляем id тасок
 			saveTasks(tasks)//записываем таски в json
+
+			fmt.Println("Задача добавлена (ID: ", len(tasks), ")")
 
 		} else if os.Args[1] == "update" && len(os.Args) == 4{
 			//изменение таски
@@ -55,6 +72,8 @@ func main(){
 			for i := 0; i < len(tasks); i++{
 				if tasks[i].Id == num{
 					tasks[i].Task = taska
+					upTime := time.Now()
+					tasks[i].Updated = upTime.Format("2006-01-02 15:04:05")
 				}
 			}
 			saveTasks(tasks)
@@ -76,15 +95,42 @@ func main(){
 			}
 			updateId(tasks) //обновляем id тасок
 			saveTasks(tasks) //сохраняем таски в файл
+		} else if os.Args[1] == "mark-in-progress" && len(os.Args) == 3{	
+			//изменяем статус таски
+			num, err := strconv.Atoi(os.Args[2])
+			if err != nil { log.Fatal(err)}
+			num--
+			if num < 0 || num >= len(tasks){
+				log.Fatal("нет такой задачи")
+				return
+			}
+			tasks[num].Status = "in-progress"
+			saveTasks(tasks)
+
+		} else if os.Args[1] == "mark-done" && len(os.Args) == 3{	
+			//изменяем статус таски
+			num, err := strconv.Atoi(os.Args[2])
+			if err != nil { log.Fatal(err)}
+			num--
+			if num < 0 || num >= len(tasks){
+				log.Fatal("нет такой задачи")
+				return
+			}
+			tasks[num].Status = "done"
+			saveTasks(tasks)
+
 		} else {
-		log.Fatal("Wrong input")
+			log.Fatal("Wrong input")
 		}
 	}
 }
 
 type Task struct{
-	Id 		int
+	Id	int
 	Task 	string
+	Status	string
+	Created string
+	Updated string
 }
 
 func greet(){
@@ -123,4 +169,10 @@ func printTasks(tasks []Task){
 		fmt.Fprintf(os.Stdout, "%d - %s\n", t.Id, t.Task)
 	}
 }
-
+func printByStatus(tasks []Task, stat string){
+	for _, t := range tasks{
+		if t.Status == stat{ 
+			fmt.Fprintf(os.Stdout, "%d - %s\n", t.Id, t.Task)
+		}
+	}
+}
