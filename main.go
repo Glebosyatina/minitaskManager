@@ -137,7 +137,7 @@ type Task struct{
 
 func greet(){
 	fmt.Println("\t\t---Task Manager---")
-	fmt.Println("Run programm like: Tas [command] [numberTask] [\"taskString\"]")
+	fmt.Println("Run programm like: tas [command] [numberTask] [\"taskString\"]")
 	fmt.Println("For example: tas add \"Buy Milk\"")
 	fmt.Println("\t     tas delete 1")
 	fmt.Println("\t     tas delete all")
@@ -145,6 +145,7 @@ func greet(){
 	fmt.Println("\t     tas mark-todo[mark-in-progress, mark-done] 3")
 	fmt.Println("\t     tas list")
 	fmt.Println("\t     tas list todo[in-progress, done]")
+    fmt.Println("\t     tas list v")
 }
 //удаление таски по номеру
 func removeById(slice []Task, idx int) ([]Task, error){
