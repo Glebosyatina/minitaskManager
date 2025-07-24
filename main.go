@@ -45,7 +45,9 @@ func main(){
 				printByStatus(tasks, "in-progress")
 			} else if os.Args[2] == "done"{
 				printByStatus(tasks, "done")
-			} else {
+			} else if os.Args[2] == "v"{
+				printVerbose(tasks)				
+			}else {
 				log.Fatal("Wrong input")
 			}
 
@@ -139,9 +141,10 @@ func greet(){
 	fmt.Println("For example: tas add \"Buy Milk\"")
 	fmt.Println("\t     tas delete 1")
 	fmt.Println("\t     tas delete all")
-	fmt.Println("\t     tas list")
 	fmt.Println("\t     tas update 1 \"buy milk\"")
-	fmt.Println("\t\t---  Good luck ---")
+	fmt.Println("\t     tas mark-todo[mark-in-progress, mark-done] 3")
+	fmt.Println("\t     tas list")
+	fmt.Println("\t     tas list todo[in-progress, done]")
 }
 //удаление таски по номеру
 func removeById(slice []Task, idx int) ([]Task, error){
@@ -175,4 +178,12 @@ func printByStatus(tasks []Task, stat string){
 			fmt.Fprintf(os.Stdout, "%d - %s\n", t.Id, t.Task)
 		}
 	}
+}
+func printVerbose(tasks []Task){
+	fmt.Println("ID  Taska\tCreated\t\t\tUpdated\t\t\tStatus")
+	for _, taska := range tasks{
+		fmt.Fprintf(os.Stdout, "%d - %s\t%s\t%s\t%s\n", taska.Id, taska.Task, taska.Created, taska.Updated, taska.Status) 
+
+	}
+
 }
